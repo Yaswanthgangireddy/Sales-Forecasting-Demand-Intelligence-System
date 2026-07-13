@@ -8,7 +8,12 @@ st.title("🔮 Forecast Explorer")
 
 df=pd.read_csv("clean_superstore.csv")
 
-df["Order Date"]=pd.to_datetime(df["Order Date"],dayfirst=True)
+df["Order Date"] = pd.to_datetime(
+    df["Order Date"],
+    dayfirst=True,
+    format="mixed",
+    errors="coerce"
+)
 
 monthly=df.groupby(pd.Grouper(key="Order Date",freq="ME"))["Sales"].sum().reset_index()
 
