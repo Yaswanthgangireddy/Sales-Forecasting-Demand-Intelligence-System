@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
@@ -8,42 +7,62 @@ import plotly.express as px
 
 st.title("📦 Product Demand Segments")
 
-df=pd.read_csv("clean_superstore.csv")
+# Load dataset
+df = pd.read_csv("clean_superstore.csv")
 
-cluster=df.groupby("Sub-Category").agg(
-Sales=("Sales","sum"),
-Profit=("Profit","sum"),
-Quantity=("Quantity","sum")
+# Check required columns
+required_columns = ["Sub-Category", "Sales"]
+
+for col in required_columns:
+    if col not in df.columns:
+        st.error(f"Column '{col}' not found in dataset.")
+        st.write("Available Columns:")
+        st.write(df.columns.tolist())
+        st.stop()
+
+# Aggregate only available columns
+cluster = df.groupby("Sub-Category").agg(
+    Total_Sales=("Sales", "sum"),
+    Average_Sales=("Sales", "mean"),
+    Sales_Count=("Sales", "count")
 ).reset_index()
 
-X=cluster[["Sales","Profit","Quantity"]]
+# Features for clustering
+X = cluster[["Total_Sales", "Average_Sales", "Sales_Count"]]
 
-X=StandardScaler().fit_transform(X)
+# Scale features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
 
-kmeans=KMeans(
-n_clusters=4,
-random_state=42,
-n_init=10
+# KMeans
+kmeans = KMeans(
+    n_clusters=4,
+    random_state=42,
+    n_init=10
 )
 
-cluster["Cluster"]=kmeans.fit_predict(X)
+cluster["Cluster"] = kmeans.fit_predict(X_scaled)
 
-pca=PCA(n_components=2)
+# PCA
+pca = PCA(n_components=2)
 
-points=pca.fit_transform(X)
+points = pca.fit_transform(X_scaled)
 
-cluster["PCA1"]=points[:,0]
+cluster["PCA1"] = points[:, 0]
+cluster["PCA2"] = points[:, 1]
 
-cluster["PCA2"]=points[:,1]
-
-fig=px.scatter(
-cluster,
-x="PCA1",
-y="PCA2",
-color=cluster["Cluster"].astype(str),
-hover_name="Sub-Category"
+# Scatter Plot
+fig = px.scatter(
+    cluster,
+    x="PCA1",
+    y="PCA2",
+    color=cluster["Cluster"].astype(str),
+    hover_name="Sub-Category",
+    title="Product Demand Segments"
 )
 
-st.plotly_chart(fig,use_container_width=True)
+st.plotly_chart(fig, use_container_width=True)
+
+st.subheader("Clustered Products")
 
 st.dataframe(cluster)
