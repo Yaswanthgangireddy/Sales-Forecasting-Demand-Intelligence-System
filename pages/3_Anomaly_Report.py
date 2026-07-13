@@ -8,8 +8,12 @@ st.title("🚨 Sales Anomaly Report")
 
 df=pd.read_csv("clean_superstore.csv")
 
-df["Order Date"]=pd.to_datetime(df["Order Date"],dayfirst=True)
-
+df["Order Date"] = pd.to_datetime(
+    df["Order Date"],
+    dayfirst=True,
+    format="mixed",
+    errors="coerce"
+)
 weekly=df.groupby(pd.Grouper(key="Order Date",freq="W"))["Sales"].sum().reset_index()
 
 model=IsolationForest(
