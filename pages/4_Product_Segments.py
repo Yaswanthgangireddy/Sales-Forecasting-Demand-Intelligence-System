@@ -8,7 +8,7 @@ import plotly.express as px
 
 st.title("📦 Product Demand Segments")
 
-df=pd.read_csv("train.csv")
+df=pd.read_csv("clean_superstore.csv")
 
 cluster=df.groupby("Sub-Category").agg(
 Sales=("Sales","sum"),
