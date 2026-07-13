@@ -6,7 +6,7 @@ import plotly.express as px
 
 st.title("🚨 Sales Anomaly Report")
 
-df=pd.read_csv("train.csv")
+df=pd.read_csv("clean_superstore.csv")
 
 df["Order Date"]=pd.to_datetime(df["Order Date"],dayfirst=True)
 
