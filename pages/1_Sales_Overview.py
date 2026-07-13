@@ -7,7 +7,12 @@ st.title("📈 Sales Overview Dashboard")
 
 df = pd.read_csv("clean_superstore.csv")
 
-df["Order Date"] = pd.to_datetime(df["Order Date"], dayfirst=True)
+df["Order Date"] = pd.to_datetime(
+    df["Order Date"],
+    dayfirst=True,
+    format="mixed",
+    errors="coerce"
+)
 
 df["Year"] = df["Order Date"].dt.year
 df["Month"] = df["Order Date"].dt.month_name()
